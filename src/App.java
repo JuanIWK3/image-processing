@@ -10,6 +10,8 @@ import javax.swing.*;
 import java.util.*;
 
 public class App extends JFrame {
+	private Transformations transformations = new Transformations();
+	private Filters filters = new Filters();
 	private JDesktopPane theDesktop;
 	private int[][] matR, matG, matB;
 
@@ -17,306 +19,58 @@ public class App extends JFrame {
 	String path = "";
 
 	// make the image gray by getting the average of the colors
-	public void escalaCinza(ActionEvent e) {
-		Vector<int[][]> rgbMat = getMatrixRGB();
-		matR = rgbMat.elementAt(0);
-		matG = rgbMat.elementAt(1);
-		matB = rgbMat.elementAt(2);
+	public void grayScale(ActionEvent e) {
+		int[][] mat = filters.grayScale(getMatrixRGB());
+		geraImagem(mat, mat, mat);
+	}
 
-		int[][] mat = new int[matR.length][matR[0].length];
+	// make it gray by getting the darkest color of each pixel
+	public void darkGrayScale(ActionEvent e) {
+		int[][] mat = filters.darkGrayScale(getMatrixRGB());
+		geraImagem(mat, mat, mat);
+	}
 
-		for (int i = 0; i < matR.length; i++) {
-			for (int j = 0; j < matR[0].length; j++) {
-				mat[i][j] = (matR[i][j] + matG[i][j] + matB[i][j]) / 3;
-			}
-		}
-
+	// make it gray by getting the lightest color of each pixel
+	public void lightGrayScale(ActionEvent e) {
+		int[][] mat = filters.lightGrayScale(getMatrixRGB());
 		geraImagem(mat, mat, mat);
 	}
 
 	// make the image binary by comparing the pixel color with 127
-	public void imagemBinaria(ActionEvent e) {
-		Vector<int[][]> rgbMat = getMatrixRGB();
-		matR = rgbMat.elementAt(0);
-		matG = rgbMat.elementAt(1);
-		matB = rgbMat.elementAt(2);
-
-		int[][] mat = new int[matR.length][matR[0].length];
-
-		for (int i = 0; i < matR.length; i++) {
-			for (int j = 0; j < matR[0].length; j++) {
-				if (matR[i][j] > 127) {
-					mat[i][j] = 255;
-				} else {
-					mat[i][j] = 0;
-				}
-			}
-		}
-
+	public void binary(ActionEvent e) {
+		int[][] mat = filters.binary(getMatrixRGB());
 		geraImagem(mat, mat, mat);
-
 	}
 
 	// make the image negative by subtracting the pixel color from 255
-	public void imagemNegativa(ActionEvent e) {
-		Vector<int[][]> rgbMat = getMatrixRGB();
-		matR = rgbMat.elementAt(0);
-		matG = rgbMat.elementAt(1);
-		matB = rgbMat.elementAt(2);
-
-		int[][] mat = new int[matR.length][matR[0].length];
-
-		for (int i = 0; i < matR.length; i++) {
-			for (int j = 0; j < matR[0].length; j++) {
-				mat[i][j] = 255 - matR[i][j];
-			}
-		}
-
+	public void negative(ActionEvent e) {
+		int[][] mat = filters.negative(getMatrixRGB());
 		geraImagem(mat, mat, mat);
 	}
 
 	// wil generate a tricolor image based on the dominant color of each pixel
-	public void corDominante(ActionEvent e) {
-		Vector<int[][]> rgbMat = getMatrixRGB();
-		matR = rgbMat.elementAt(0);
-		matG = rgbMat.elementAt(1);
-		matB = rgbMat.elementAt(2);
-
-		int[][] mat = new int[matR.length][matR[0].length];
-		int[][] mat2 = new int[matR.length][matR[0].length];
-		int[][] mat3 = new int[matR.length][matR[0].length];
-
-		for (int i = 0; i < matR.length; i++) {
-			for (int j = 0; j < matR[0].length; j++) {
-				if (matR[i][j] > matG[i][j] && matR[i][j] > matB[i][j]) {
-					mat[i][j] = 255;
-					mat2[i][j] = 0;
-					mat3[i][j] = 0;
-				} else if (matG[i][j] > matR[i][j] && matG[i][j] > matB[i][j]) {
-					mat[i][j] = 0;
-					mat2[i][j] = 255;
-					mat3[i][j] = 0;
-				} else {
-					mat[i][j] = 0;
-					mat2[i][j] = 0;
-					mat3[i][j] = 255;
-				}
-			}
-		}
-
-		geraImagem(mat, mat2, mat3);
-	}
-
-	// make it gray by getting the darkest color of each pixel
-	public void escalaCinzaEscuro(ActionEvent e) {
-		Vector<int[][]> rgbMat = getMatrixRGB();
-		matR = rgbMat.elementAt(0);
-		matG = rgbMat.elementAt(1);
-		matB = rgbMat.elementAt(2);
-
-		int[][] mat = new int[matR.length][matR[0].length];
-		int[][] mat2 = new int[matR.length][matR[0].length];
-		int[][] mat3 = new int[matR.length][matR[0].length];
-
-		for (int i = 0; i < matR.length; i++) {
-			for (int j = 0; j < matR[0].length; j++) {
-				if (matR[i][j] < matG[i][j] && matR[i][j] < matB[i][j]) {
-					mat[i][j] = matR[i][j];
-					mat2[i][j] = matR[i][j];
-					mat3[i][j] = matR[i][j];
-				} else if (matG[i][j] < matR[i][j] && matG[i][j] < matB[i][j]) {
-					mat[i][j] = matG[i][j];
-					mat2[i][j] = matG[i][j];
-					mat3[i][j] = matG[i][j];
-				} else {
-					mat[i][j] = matB[i][j];
-					mat2[i][j] = matB[i][j];
-					mat3[i][j] = matB[i][j];
-				}
-			}
-		}
-
-		geraImagem(mat, mat2, mat3);
-	}
-
-	// make it gray by getting the lightest color of each pixel
-	public void escalaCinzaClaro(ActionEvent e) {
-		Vector<int[][]> rgbMat = getMatrixRGB();
-		matR = rgbMat.elementAt(0);
-		matG = rgbMat.elementAt(1);
-		matB = rgbMat.elementAt(2);
-
-		int[][] mat = new int[matR.length][matR[0].length];
-		int[][] mat2 = new int[matR.length][matR[0].length];
-		int[][] mat3 = new int[matR.length][matR[0].length];
-
-		for (int i = 0; i < matR.length; i++) {
-			for (int j = 0; j < matR[0].length; j++) {
-				if (matR[i][j] > matG[i][j] && matR[i][j] > matB[i][j]) {
-					mat[i][j] = matR[i][j];
-					mat2[i][j] = matR[i][j];
-					mat3[i][j] = matR[i][j];
-				} else if (matG[i][j] > matR[i][j] && matG[i][j] > matB[i][j]) {
-					mat[i][j] = matG[i][j];
-					mat2[i][j] = matG[i][j];
-					mat3[i][j] = matG[i][j];
-				} else {
-					mat[i][j] = matB[i][j];
-					mat2[i][j] = matB[i][j];
-					mat3[i][j] = matB[i][j];
-				}
-			}
-		}
-
-		geraImagem(mat, mat2, mat3);
+	public void dominantColor(ActionEvent e) {
+		int[][][] mat = filters.dominantColor(getMatrixRGB());
+		geraImagem(mat[0], mat[1], mat[2]);
 	}
 
 	// If the color of the pixel is greater than 167, it will mantain the color,
 	// else make the pixel gray
 	public void userFilter(ActionEvent e) {
-		Vector<int[][]> rgbMat = getMatrixRGB();
-		matR = rgbMat.elementAt(0);
-		matG = rgbMat.elementAt(1);
-		matB = rgbMat.elementAt(2);
-
-		int[][] mat = new int[matR.length][matR[0].length];
-		int[][] mat2 = new int[matR.length][matR[0].length];
-		int[][] mat3 = new int[matR.length][matR[0].length];
-
-		String[] options = { "R", "G", "B" };
-		int response = JOptionPane.showOptionDialog(null, "Escolha uma cor", "Filtro",
-				JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-		String option = options[response];
-
-		for (int i = 0; i < matR.length; i++) {
-			for (int j = 0; j < matR[0].length; j++) {
-				if (option == "R") {
-					if (matR[i][j] > 167) {
-						mat[i][j] = matR[i][j];
-						mat2[i][j] = matG[i][j];
-						mat3[i][j] = matB[i][j];
-					} else {
-						mat[i][j] = (int) (0.3 * matR[i][j] + 0.59 * matG[i][j] + 0.11 * matB[i][j]);
-						mat2[i][j] = mat[i][j];
-						mat3[i][j] = mat[i][j];
-					}
-				} else if (option == "G") {
-					if (matG[i][j] > 167) {
-						mat[i][j] = matR[i][j];
-						mat2[i][j] = matG[i][j];
-						mat3[i][j] = matB[i][j];
-					} else {
-						mat[i][j] = (int) (0.3 * matR[i][j] + 0.59 * matG[i][j] + 0.11 * matB[i][j]);
-						mat2[i][j] = mat[i][j];
-						mat3[i][j] = mat[i][j];
-					}
-				} else {
-					if (matB[i][j] > 167) {
-						mat[i][j] = matR[i][j];
-						mat2[i][j] = matG[i][j];
-						mat3[i][j] = matB[i][j];
-					} else {
-						mat[i][j] = (int) (0.3 * matR[i][j] + 0.59 * matG[i][j] + 0.11 * matB[i][j]);
-						mat2[i][j] = mat[i][j];
-						mat3[i][j] = mat[i][j];
-					}
-				}
-			}
-		}
-
-		geraImagem(mat, mat2, mat3);
+		int[][][] mat = filters.userFilter(getMatrixRGB());
+		geraImagem(mat[0], mat[1], mat[2]);
 	}
 
 	// remove the color selected by the user
 	public void removeColor(ActionEvent e) {
-		Vector<int[][]> rgbMat = getMatrixRGB();
-		matR = rgbMat.elementAt(0);
-		matG = rgbMat.elementAt(1);
-		matB = rgbMat.elementAt(2);
-
-		int[][] mat = new int[matR.length][matR[0].length];
-		int[][] mat2 = new int[matR.length][matR[0].length];
-		int[][] mat3 = new int[matR.length][matR[0].length];
-
-		String[] options = { "R", "G", "B" };
-		int response = JOptionPane.showOptionDialog(null, "Escolha uma cor", "Filtro",
-				JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-		String option = options[response];
-
-		for (int i = 0; i < matR.length; i++) {
-			for (int j = 0; j < matR[0].length; j++) {
-				if (option == "R") {
-					mat[i][j] = 0;
-					mat2[i][j] = matG[i][j];
-					mat3[i][j] = matB[i][j];
-				} else if (option == "G") {
-					mat[i][j] = matR[i][j];
-					mat2[i][j] = 0;
-					mat3[i][j] = matB[i][j];
-				} else {
-					mat[i][j] = matR[i][j];
-					mat2[i][j] = matG[i][j];
-					mat3[i][j] = 0;
-				}
-			}
-		}
-
-		geraImagem(mat, mat2, mat3);
+		int[][][] mat = filters.removeColor(getMatrixRGB());
+		geraImagem(mat[0], mat[1], mat[2]);
 	}
 
 	// remove the dominant color of the pixel
 	public void removerCorDominante(ActionEvent e) {
-		Vector<int[][]> rgbMat = getMatrixRGB();
-		matR = rgbMat.elementAt(0);
-		matG = rgbMat.elementAt(1);
-		matB = rgbMat.elementAt(2);
-
-		int[][] mat = new int[matR.length][matR[0].length];
-		int[][] mat2 = new int[matR.length][matR[0].length];
-		int[][] mat3 = new int[matR.length][matR[0].length];
-
-		String[] options = { "R", "G", "B" };
-		int response = JOptionPane.showOptionDialog(null, "Escolha uma cor", "Filtro",
-				JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-		String option = options[response];
-
-		for (int i = 0; i < matR.length; i++) {
-			for (int j = 0; j < matR[0].length; j++) {
-				if (option == "R") {
-					if (matR[i][j] > matG[i][j] && matR[i][j] > matB[i][j]) {
-						mat[i][j] = (int) (0.3 * matR[i][j] + 0.59 * matG[i][j] + 0.11 * matB[i][j]);
-						mat2[i][j] = mat[i][j];
-						mat3[i][j] = mat[i][j];
-					} else {
-						mat[i][j] = matR[i][j];
-						mat2[i][j] = matG[i][j];
-						mat3[i][j] = matB[i][j];
-					}
-				} else if (option == "G") {
-					if (matG[i][j] > matR[i][j] && matG[i][j] > matB[i][j]) {
-						mat[i][j] = (int) (0.3 * matR[i][j] + 0.59 * matG[i][j] + 0.11 * matB[i][j]);
-						mat2[i][j] = mat[i][j];
-						mat3[i][j] = mat[i][j];
-					} else {
-						mat[i][j] = matR[i][j];
-						mat2[i][j] = matG[i][j];
-						mat3[i][j] = matB[i][j];
-					}
-				} else {
-					if (matB[i][j] > matR[i][j] && matB[i][j] > matG[i][j]) {
-						mat[i][j] = (int) (0.3 * matR[i][j] + 0.59 * matG[i][j] + 0.11 * matB[i][j]);
-						mat2[i][j] = mat[i][j];
-						mat3[i][j] = mat[i][j];
-					} else {
-						mat[i][j] = matR[i][j];
-						mat2[i][j] = matG[i][j];
-						mat3[i][j] = matB[i][j];
-					}
-				}
-			}
-		}
-
-		geraImagem(mat, mat2, mat3);
+		int[][][] mat = filters.removeDominantColor(getMatrixRGB());
+		geraImagem(mat[0], mat[1], mat[2]);
 	}
 
 	public App() {
@@ -330,7 +84,8 @@ public class App extends JFrame {
 		addMenu.add(newFrame);
 		bar.add(addMenu);
 
-		JMenu addMenu2 = new JMenu("Processar");
+		// Filters menu
+		JMenu addMenu2 = new JMenu("Filters");
 		JMenuItem item1 = new JMenuItem("Escala de cinza");
 		JMenuItem item2 = new JMenuItem("Imagem binária");
 		JMenuItem item3 = new JMenuItem("Negativa");
@@ -352,6 +107,15 @@ public class App extends JFrame {
 		addMenu2.add(item9);
 
 		bar.add(addMenu2);
+
+		// Transform menu
+		JMenu addMenu3 = new JMenu("Transform");
+
+		JMenuItem item10 = new JMenuItem("Rotate");
+
+		addMenu3.add(item10);
+
+		bar.add(addMenu3);
 
 		setJMenuBar(bar);
 
@@ -400,12 +164,12 @@ public class App extends JFrame {
 					}
 				});
 
-		item1.addActionListener(this::escalaCinza);
-		item2.addActionListener(this::imagemBinaria);
-		item3.addActionListener(this::imagemNegativa);
-		item4.addActionListener(this::corDominante);
-		item5.addActionListener(this::escalaCinzaEscuro);
-		item6.addActionListener(this::escalaCinzaClaro);
+		item1.addActionListener(this::grayScale);
+		item2.addActionListener(this::binary);
+		item3.addActionListener(this::negative);
+		item4.addActionListener(this::dominantColor);
+		item5.addActionListener(this::darkGrayScale);
+		item6.addActionListener(this::lightGrayScale);
 		item7.addActionListener(this::userFilter);
 		item8.addActionListener(this::removeColor);
 		item9.addActionListener(this::removerCorDominante);
