@@ -73,6 +73,12 @@ public class App extends JFrame {
 		geraImagem(mat[0], mat[1], mat[2]);
 	}
 
+	public void smoothByAverage(ActionEvent e) {
+		int size = Integer.parseInt(JOptionPane.showInputDialog("Tamanho da matriz: "));
+		int[][] mat = filters.smoothByAverage(getMatrixRGB(), size);
+		geraImagem(mat, mat, mat);
+	}
+
 	public App() {
 		super("PhotoIFMG");
 		JMenuBar bar = new JMenuBar();
@@ -95,6 +101,7 @@ public class App extends JFrame {
 		JMenuItem item7 = new JMenuItem("Filtro pelo usuário");
 		JMenuItem item8 = new JMenuItem("Remover cor pelo usuário");
 		JMenuItem item9 = new JMenuItem("Remover cor dominante pelo usuário");
+		JMenuItem item10 = new JMenuItem("Suavizar por média");
 
 		addMenu2.add(item1);
 		addMenu2.add(item2);
@@ -105,17 +112,9 @@ public class App extends JFrame {
 		addMenu2.add(item7);
 		addMenu2.add(item8);
 		addMenu2.add(item9);
+		addMenu2.add(item10);
 
 		bar.add(addMenu2);
-
-		// Transform menu
-		JMenu addMenu3 = new JMenu("Transform");
-
-		JMenuItem item10 = new JMenuItem("Rotate");
-
-		addMenu3.add(item10);
-
-		bar.add(addMenu3);
 
 		setJMenuBar(bar);
 
@@ -173,6 +172,7 @@ public class App extends JFrame {
 		item7.addActionListener(this::userFilter);
 		item8.addActionListener(this::removeColor);
 		item9.addActionListener(this::removerCorDominante);
+		item10.addActionListener(this::smoothByAverage);
 
 		setSize(600, 400);
 		setVisible(true);
