@@ -7,6 +7,34 @@ public class Filters {
   private int[][] matG;
   private int[][] matB;
 
+  public int[][] smoothByAverage(Vector<int[][]> rgbMat, int size) {
+    matR = rgbMat.elementAt(0);
+    matG = rgbMat.elementAt(1);
+    matB = rgbMat.elementAt(2);
+
+    int[][] mat = new int[matR.length][matR[0].length];
+
+    for (int i = 0; i < matR.length; i++) {
+      for (int j = 0; j < matR[0].length; j++) {
+        int sumR = 0;
+        int count = 0;
+
+        for (int k = i - size / 2; k <= i + size / 2; k++) {
+          for (int l = j - size / 2; l <= j + size / 2; l++) {
+            if (k >= 0 && k < matR.length && l >= 0 && l < matR[0].length) {
+              sumR += matR[k][l];
+              count++;
+            }
+          }
+        }
+
+        mat[i][j] = (int) (sumR / count);
+      }
+    }
+
+    return mat;
+  }
+
   public int[][] grayScale(Vector<int[][]> rgbMat) {
     matR = rgbMat.elementAt(0);
     matG = rgbMat.elementAt(1);
