@@ -1,16 +1,28 @@
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.util.*;
+import javax.swing.ImageIcon;
+import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 public class App extends JFrame {
-	private Transformations transformations = new Transformations();
 	private Filters filters = new Filters();
 	private JDesktopPane theDesktop;
 	private int[][] matR, matG, matB;
@@ -79,6 +91,51 @@ public class App extends JFrame {
 		geraImagem(mat, mat, mat);
 	}
 
+	public void smoothByMedian(ActionEvent e) {
+		int size = Integer.parseInt(JOptionPane.showInputDialog("Tamanho da matriz: "));
+		int[][] mat = filters.smoothByMedian(getMatrixRGB(), size);
+		geraImagem(mat, mat, mat);
+	}
+
+	public void sobel(ActionEvent e) {
+		int[][] mat = filters.sobel(getMatrixRGB());
+		geraImagem(mat, mat, mat);
+	}
+
+	public void gaussianFilter(ActionEvent e) {
+		int size = Integer.parseInt(JOptionPane.showInputDialog("Tamanho da matriz: "));
+		Vector<int[][]> mat = filters.gaussianFilter(getMatrixRGB(), size);
+		geraImagem(mat.get(0), mat.get(1), mat.get(2));
+	}
+
+	public void gradientFilter(ActionEvent e) {
+		int[][] mat = filters.gradientFilter(getMatrixRGB());
+		geraImagem(mat, mat, mat);
+	}
+
+	public void insertImage(ActionEvent e) {
+		Vector<int[][]> firstImageRGB = getMatrixRGB();
+		Vector<int[][]> firstImageBlurred = filters.gaussianFilter(firstImageRGB, 8);
+
+		int result = fc.showOpenDialog(null);
+		if (result == JFileChooser.CANCEL_OPTION) {
+			return;
+		}
+
+		String path2 = fc.getSelectedFile().getAbsolutePath();
+
+		Vector<int[][]> secondImageRGB = getMatrixRGB(path2);
+
+		Vector<int[][]> finalImage;
+		Vector<int[][]> finalImageBlurred;
+
+		finalImage = filters.insertImage(firstImageRGB, secondImageRGB);
+		finalImageBlurred = filters.insertImage(firstImageBlurred, secondImageRGB);
+
+		geraImagem(finalImage.get(0), finalImage.get(1), finalImage.get(2));
+		geraImagem(finalImageBlurred.get(0), finalImageBlurred.get(1), finalImageBlurred.get(2));
+	}
+
 	public App() {
 		super("PhotoIFMG");
 		JMenuBar bar = new JMenuBar();
@@ -102,6 +159,11 @@ public class App extends JFrame {
 		JMenuItem item8 = new JMenuItem("Remover cor pelo usuário");
 		JMenuItem item9 = new JMenuItem("Remover cor dominante pelo usuário");
 		JMenuItem item10 = new JMenuItem("Suavizar por média");
+		JMenuItem item11 = new JMenuItem("Suavizar por mediana");
+		JMenuItem item12 = new JMenuItem("Filtro de borda");
+		JMenuItem item13 = new JMenuItem("Filtro de gauss");
+		JMenuItem item14 = new JMenuItem("Filtro de gradiente");
+		JMenuItem item15 = new JMenuItem("Insert Image");
 
 		addMenu2.add(item1);
 		addMenu2.add(item2);
@@ -113,6 +175,11 @@ public class App extends JFrame {
 		addMenu2.add(item8);
 		addMenu2.add(item9);
 		addMenu2.add(item10);
+		addMenu2.add(item11);
+		addMenu2.add(item12);
+		addMenu2.add(item13);
+		addMenu2.add(item14);
+		addMenu2.add(item15);
 
 		bar.add(addMenu2);
 
@@ -173,13 +240,21 @@ public class App extends JFrame {
 		item8.addActionListener(this::removeColor);
 		item9.addActionListener(this::removerCorDominante);
 		item10.addActionListener(this::smoothByAverage);
+		item11.addActionListener(this::smoothByMedian);
+		item12.addActionListener(this::sobel);
+		item13.addActionListener(this::gaussianFilter);
+		item14.addActionListener(this::gradientFilter);
+		item15.addActionListener(this::insertImage);
 
 		setSize(600, 400);
 		setVisible(true);
 	}
 
-	// ler matrizes da imagem
 	public Vector<int[][]> getMatrixRGB() {
+		return getMatrixRGB(path);
+	}
+
+	public Vector<int[][]> getMatrixRGB(String path) {
 		BufferedImage img;
 		int[][] rmat = null;
 		int[][] gmat = null;
