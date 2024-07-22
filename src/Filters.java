@@ -18,11 +18,6 @@ public class Filters {
     int[][] matG2 = secondRGB.elementAt(1);
     int[][] matB2 = secondRGB.elementAt(2);
 
-    // the second image is a person and a white background
-    // we need to remove the white background
-    // and insert the person in the first image at the center of the second image
-
-    // check if the second image is bigger
     if (matR.length < matR2.length || matR[0].length < matR2[0].length) {
       System.out.println("The first image should be bigger than the second image");
       return null;
@@ -32,8 +27,10 @@ public class Filters {
     int[][] newG = new int[matR.length][matR[0].length];
     int[][] newB = new int[matR.length][matR[0].length];
 
+    // interate the first image
     for (int i = 0; i < matR.length; i++) {
       for (int j = 0; j < matR[0].length; j++) {
+        // if the pixel is inside the second image
         if (i >= (matR.length - matR2.length) / 2 && i < (matR.length + matR2.length) / 2
             && j >= (matR[0].length - matR2[0].length) / 2
             && j < (matR[0].length + matR2[0].length) / 2) {
@@ -41,16 +38,23 @@ public class Filters {
           int srcI = i - (matR.length - matR2.length) / 2;
           int srcJ = j - (matR[0].length - matR2[0].length) / 2;
 
-          if (matR2[srcI][srcJ] < 245 || matG2[srcI][srcJ] < 245 || matB2[srcI][srcJ] < 245) {
+          // if the pixel of the second image is not white, use it
+          // it would be better to use a border detection algorithm
+
+          int threshold = 245;
+
+          if (matR2[srcI][srcJ] < threshold || matG2[srcI][srcJ] < threshold || matB2[srcI][srcJ] < threshold) {
             newR[i][j] = matR2[srcI][srcJ];
             newG[i][j] = matG2[srcI][srcJ];
             newB[i][j] = matB2[srcI][srcJ];
           } else {
+            // if the pixel of the second image is white, use the pixel of the first image
             newR[i][j] = matR[i][j];
             newG[i][j] = matG[i][j];
             newB[i][j] = matB[i][j];
           }
         } else {
+          // if the pixel is outside the second image, use the pixel of the first image
           newR[i][j] = matR[i][j];
           newG[i][j] = matG[i][j];
           newB[i][j] = matB[i][j];
